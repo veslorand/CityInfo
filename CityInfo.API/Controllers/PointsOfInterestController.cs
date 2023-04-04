@@ -9,15 +9,31 @@ namespace CityInfo.API.Controllers
     [ApiController]
     public class PointsOfInterestController : ControllerBase
     {
+        private readonly ILogger<PointsOfInterestController> _logger;
+
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
+        {
+            _logger = logger ?? throw new ArgumentException(nameof(logger));
+
+        }
         [HttpGet]
         public ActionResult<IEnumerable<PointOfInterestDto>> GetPointsOfInterest(int cityId)
         {
-            var city = CitiesDataStore.Current.Cities.FirstOrDefault(city => city.Id == cityId);
-            if (city == null)
+            try
             {
-                return NotFound();
+                var city = CitiesDataStore.Current.Cities.FirstOrDefault(city => city.Id == cityId);
+                if (city == null)
+                {
+                    _logger.LogInformation($"City not found: {cityId}");
+                    return NotFound();
+                }
+                return Ok(city.PointsOfInterest);
             }
-            return Ok(city.PointsOfInterest);
+            catch (Exception ex)
+            {
+                _logger.LogCritical($"OMGGGGG: {cityId}", ex);
+                return StatusCode(500, "Problem while handling your request");
+            }
         }
 
         [HttpGet("{pointofinterestid}", Name = "GetPointOfInterest")]
