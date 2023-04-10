@@ -8,8 +8,8 @@
 
         public CloudMailService(IConfiguration configuration)
         {
-            _mailTo = "mailSettings:mailToAddress";
-            _mailFrom = "mailSettings:mailFromAddress";
+            _mailTo = configuration["mailSettings:mailToAddress"];
+            _mailFrom = configuration["mailSettings:mailFromAddress"];
         }
 
         public void Send(string subject, string message)
